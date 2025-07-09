@@ -6,3 +6,10 @@ class Product(models.Model):
     quantity = models.FloatField()
     tax = models.FloatField()
     price = models.FloatField()
+
+class DeliveryNote(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    price = models.FloatField()
+    belongsTo = models.CharField(max_length=200)
+    receivedBy = models.CharField(max_length=200)
