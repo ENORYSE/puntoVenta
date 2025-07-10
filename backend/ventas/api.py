@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions
-from .models import DeliveryNote
-from .serializers import DeliveryNoteSerializer
+from .models import Remito
+from .serializers import RemitoSerializer
 
-class DeliveryNoteViewSet(viewsets.ModelViewSet):
-    queryset = DeliveryNote.objects.all()
-    serializer_class = DeliveryNoteSerializer
+class RemitoViewSet(viewsets.ModelViewSet):
+    queryset = Remito.objects.all()
+    serializer_class = RemitoSerializer
     permission_classes = [permissions.AllowAny]

@@ -40,6 +40,11 @@ INSTALLED_APPS = [
     'productos',
     'corsheaders',
     'rest_framework',
+    'ventas',
+    'usuarios',
+    'turnos',
+    'reportes',
+    'actividades',
 ]
 
 MIDDLEWARE = [
