@@ -16,3 +16,6 @@ class ProductViewSet(viewsets.ModelViewSet):
             detalle=f"Producto: {producto.name}, Precio: {producto.price}, Stock: {producto.quantity}"
         )
 
+class ProductViewSet(viewsets.ModelViewSet): #pustete
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
