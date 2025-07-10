@@ -1,6 +1,6 @@
 const routes = [
-    { path: '/', module: './pages/home.js' },
-    { path: '/about', module: './pages/about.js' },
+    { path: '/', module: 'home.js' },
+    { path: '/about', module: 'about.js' },
 ];
 
 export default routes;

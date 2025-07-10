@@ -1,4 +1,4 @@
-export function render() {
+function About() {
     const div = document.createElement('div');
     div.innerHTML = `
         <h1>Sobre nosotros</h1>
@@ -7,3 +7,5 @@ export function render() {
     `;
     return div;
 }
+
+export default About;
