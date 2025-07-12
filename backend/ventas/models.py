@@ -6,7 +6,7 @@ class Remito(models.Model):
     total_estimado = models.DecimalField(max_digits=10, decimal_places=2)
     pertenece_a = models.CharField(max_length=200)  # proveedor, empresa, etc.
     recibido_por = models.CharField(max_length=200)  # nombre del empleado
-    fecha = models.DateField(auto_now_add=True)
+    fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Remito {self.numero} - {self.pertenece_a}"
@@ -84,7 +84,7 @@ class MovimientoStock(models.Model):
 
 class Compra(models.Model):
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE, related_name='compras')
-    fecha = models.DateField()
+    fecha = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=12, decimal_places=2)
     numero_factura = models.CharField(max_length=100, unique=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -153,3 +153,149 @@ class DetalleVenta(models.Model):
     @property
     def subtotal(self):
         return self.cantidad * self.precio_unitario
+    
+
+#empleados
+
+
+
+class User(models.Model):
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    numero = models.CharField(max_length=20)
+    contraseña = models.CharField()
+
+class CronogramaSemanal(models.Model):
+    class Dias(models.TextChoices):
+        LUNES = 'lunes', 'Lunes'
+        MARTES = 'martes', 'Martes'
+        JUEVES = 'jueves', 'Jueves'
+        VIERNES = 'viernes', 'Viernes'
+        SABADO =  'sabado', 'Sabado'
+    
+    class Turno(models.TextChoices):
+        MAÑANA = 'mañana', 'Mañana'
+        TARDE = 'tarde', 'Tarde'
+        NOCHE = 'noche', 'Noche'
+
+    empleado_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    turno = models.CharField(choices = Turno.choices)
+    dia = models.CharField(choices = Turno.choices)
+
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['turno', 'dia', 'empleado_id'])
+        ]
+
+class RegistrosDeHorarioDeEmpleado(models.Model):
+    empleado_id = models.ForeignKey(User, on_delete=models.RESTRICT)
+    hora_entrada = models.DateTimeField(auto_now_add=True)
+    hora_salida = models.DateTimeField(null=True)
+
+class Caja(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)
+    activa = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Caja"
+        verbose_name_plural = "Cajas"
+
+    def __str__(self):
+        return self.nombre
+
+    @property
+    def saldo_actual(self):
+        movimientos = self.movimientos.all()
+        total_entradas = sum(m.monto for m in movimientos if m.tipo in ['entrada', 'venta'])
+        total_salidas = sum(m.monto for m in movimientos if m.tipo in ['salida', 'gasto'])
+        return total_entradas - total_salidas
+
+
+class CajaMovimiento(models.Model):
+    
+    class TipoMovimiento(models.TextChoices):
+        ENTRADA = 'entrada', 'Entrada de Efectivo'
+        SALIDA = 'salida', 'Salida de Efectivo'
+        VENTA = 'venta', 'Venta'
+        GASTO = 'gasto', 'Gasto'
+        APERTURA = 'apertura', 'Apertura de Caja'
+        CIERRE = 'cierre', 'Cierre de Caja'
+        AJUSTE = 'ajuste', 'Ajuste'
+        DEVOLUCION = 'devolucion', 'Devolución'
+
+    class MedioPago(models.TextChoices):
+        EFECTIVO = 'efectivo', 'Efectivo'
+        TARJETA_DEBITO = 'tarjeta_debito', 'Tarjeta de Débito'
+        TARJETA_CREDITO = 'tarjeta_credito', 'Tarjeta de Crédito'
+        TRANSFERENCIA = 'transferencia', 'Transferencia'
+        MERCADO_PAGO = 'mercado_pago', 'Mercado Pago'
+
+    caja = models.ForeignKey(Caja, on_delete=models.CASCADE, related_name='movimientos')
+    tipo = models.CharField(max_length=20, choices=TipoMovimiento.choices)
+    monto = models.DecimalField(max_digits=12, decimal_places=2)
+    medio_pago = models.CharField(
+        max_length=20,
+        choices=MedioPago.choices,
+        default=MedioPago.EFECTIVO
+    )
+    descripcion = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(User,
+        on_delete=models.CASCADE,
+        related_name='movimientos_caja'
+    )
+    venta = models.ForeignKey(
+        'Venta',
+        on_delete=models.CASCADE,
+        related_name='movimientos_caja',
+        null=True,
+        blank=True
+    )
+    
+    # For tracking external references
+    documento_referencia = models.CharField(max_length=100, blank=True)
+    
+    class Meta:
+        verbose_name = "Movimiento de Caja"
+        verbose_name_plural = "Movimientos de Caja"
+        ordering = ['-fecha']
+
+    def __str__(self):
+        return f"{self.caja.nombre} - {self.get_tipo_display()} - ${self.monto}"
+
+
+class CajaCierre(models.Model):
+    caja = models.ForeignKey(
+        Caja,
+        on_delete=models.CASCADE,
+        related_name='cierres'
+    )
+    fecha = models.DateTimeField()
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    # Calculated totals
+    saldo_inicial = models.DecimalField(max_digits=12, decimal_places=2)
+    total_ventas = models.DecimalField(max_digits=12, decimal_places=2)
+    total_gastos = models.DecimalField(max_digits=12, decimal_places=2)
+    saldo_teorico = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    efectivo_contado = models.DecimalField(max_digits=12, decimal_places=2)
+    diferencia = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    observaciones = models.TextField(blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Cierre de Caja"
+        verbose_name_plural = "Cierres de Caja"
+        unique_together = ['caja', 'fecha']
+
+    def __str__(self):
+        return f"{self.caja.nombre} - {self.fecha}"
+
+    def save(self, *args, **kwargs):
+        self.diferencia = self.efectivo_contado - self.saldo_teorico
+        super().save(*args, **kwargs)
