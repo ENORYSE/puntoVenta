@@ -166,7 +166,7 @@ class User(models.Model):
     contraseña = models.CharField()
 
 class CronogramaSemanal(models.Model):
-    class Dias(models.TextChoices):
+    class Dia(models.TextChoices):
         LUNES = 'lunes', 'Lunes'
         MARTES = 'martes', 'Martes'
         JUEVES = 'jueves', 'Jueves'
@@ -179,8 +179,8 @@ class CronogramaSemanal(models.Model):
         NOCHE = 'noche', 'Noche'
 
     empleado_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    turno = models.CharField(choices = Turno.choices)
-    dia = models.CharField(choices = Turno.choices)
+    turno = models.CharField(max_length=100 ,choices = Turno.choices)
+    dia = models.CharField(max_length=100 ,choices = Dia.choices)
 
 
     class Meta:
@@ -273,8 +273,8 @@ class CajaCierre(models.Model):
         on_delete=models.CASCADE,
         related_name='cierres'
     )
-    fecha = models.DateTimeField()
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha = models.DateTimeField()
     
     # Calculated totals
     saldo_inicial = models.DecimalField(max_digits=12, decimal_places=2)
