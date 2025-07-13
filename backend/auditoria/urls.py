@@ -3,7 +3,7 @@ from .api import TipoTurnoViewSet, TurnoAsignadoViewSet
 
 router = routers.DefaultRouter()
 
-router.register('turnos-tipos', TipoTurnoViewSet)
-router.register('turnos-asignados', TurnoAsignadoViewSet)
+router.register('api/turnos-tipos', TipoTurnoViewSet)
+router.register('api/turnos-asignados', TurnoAsignadoViewSet)
 
 urlpatterns = router.urls

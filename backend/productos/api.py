@@ -1,12 +1,12 @@
 from .models import Producto
 from auditoria.models import Actividad
 from rest_framework import viewsets, permissions
-from .serializers import ProductSerializer
+from .serializers import ProductoSerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     permissions_classes = [permissions.AllowAny]
-    serializer_class = ProductSerializer
+    serializer_class = ProductoSerializer
 
     def perform_create(self, serializer):
         producto = serializer.save()
