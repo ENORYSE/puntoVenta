@@ -1,10 +1,10 @@
-from .models import Product
-from actividades.models import Actividad
+from .models import Producto
+from auditoria.models import Actividad
 from rest_framework import viewsets, permissions
 from .serializers import ProductSerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Producto.objects.all()
     permissions_classes = [permissions.AllowAny]
     serializer_class = ProductSerializer
 
