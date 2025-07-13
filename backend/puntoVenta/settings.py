@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'usuarios.User'
+AUTH_USER_MODEL = 'auditoria.User'
 
 
 
@@ -45,10 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'ventas',
-    'usuarios',
-    'turnos',
-    'reportes',
-    'actividades',
+    'auditoria',
 ]
 
 MIDDLEWARE = [

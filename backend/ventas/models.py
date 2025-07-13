@@ -185,7 +185,7 @@ class CronogramaSemanal(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['turno', 'dia', 'empleado_id'])
+            models.UniqueConstraint(fields=['turno', 'dia', 'empleado_id'],  name='unique_turno_dia_empleado')
         ]
 
 class RegistrosDeHorarioDeEmpleado(models.Model):
