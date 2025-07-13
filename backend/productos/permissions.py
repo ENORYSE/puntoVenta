@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from groups import is_user_in_group
+from .groups import is_user_in_group
 
 class isAle(permissions.BasePermission):
     def has_permission(self, request, view):

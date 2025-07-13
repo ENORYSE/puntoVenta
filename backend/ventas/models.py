@@ -1,4 +1,8 @@
 from django.db import models
+from productos.models import Producto
+from auditoria.models import User
+
+
 
 class Remito(models.Model):
     numero = models.CharField(max_length=100, unique=True)
@@ -31,33 +35,6 @@ class Proveedor(models.Model):
 
     def __str__(self):
         return self.nombre
-
-
-class Producto(models.Model):
-    codigo_barra = models.CharField(max_length=100, unique=True)
-    nombre = models.CharField(max_length=200)
-    descripcion = models.TextField(blank=True)
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_costo = models.DecimalField(max_digits=10, decimal_places=2)
-    stock_actual = models.IntegerField(default=0,)
-    stock_minimo = models.IntegerField(default=0,)
-    unidad_medida = models.CharField(max_length=50, default='unidad')
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "Producto"
-        verbose_name_plural = "Productos"
-        ordering = ['nombre']
-
-    def __str__(self):
-        return f"{self.codigo_barra} - {self.nombre}"
-
-    @property
-    def necesita_restock(self):
-        return self.stock_actual <= self.stock_minimo
-
 
 class MovimientoStock(models.Model):
     class Tipo(models.TextChoices):
@@ -159,12 +136,6 @@ class DetalleVenta(models.Model):
 
 
 
-class User(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    numero = models.CharField(max_length=20)
-    contraseña = models.CharField()
-
 class CronogramaSemanal(models.Model):
     class Dia(models.TextChoices):
         LUNES = 'lunes', 'Lunes'
@@ -243,10 +214,7 @@ class CajaMovimiento(models.Model):
     )
     descripcion = models.TextField()
     fecha = models.DateTimeField(auto_now_add=True)
-    usuario = models.ForeignKey(User,
-        on_delete=models.CASCADE,
-        related_name='movimientos_caja'
-    )
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     venta = models.ForeignKey(
         'Venta',
         on_delete=models.CASCADE,
