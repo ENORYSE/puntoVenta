@@ -41,7 +41,6 @@ class Producto(models.Model):
     precio_costo = models.DecimalField(max_digits=10, decimal_places=2)
     stock_actual = models.IntegerField(default=0,)
     stock_minimo = models.IntegerField(default=0,)
-    unidad_medida = models.CharField(max_length=50, default='unidad')
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
