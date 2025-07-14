@@ -1,12 +1,12 @@
-from .models import Product
-from actividades.models import Actividad
+from .models import Producto
+from auditoria.models import Actividad
 from rest_framework import viewsets, permissions
-from .serializers import ProductSerializer
+from .serializers import ProductoSerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Producto.objects.all()
     permissions_classes = [permissions.AllowAny]
-    serializer_class = ProductSerializer
+    serializer_class = ProductoSerializer
 
     def perform_create(self, serializer):
         producto = serializer.save()
@@ -16,6 +16,4 @@ class ProductViewSet(viewsets.ModelViewSet):
             detalle=f"Producto: {producto.name}, Precio: {producto.price}, Stock: {producto.quantity}"
         )
 
-class ProductViewSet(viewsets.ModelViewSet): #pustete
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+

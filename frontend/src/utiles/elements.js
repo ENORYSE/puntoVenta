@@ -140,3 +140,16 @@ export function button(content = '', attrs = {}) {
     Object.assign(el, attrs);  // Asigna los atributos si se pasan
     return el;
 }
+
+/**
+ * Crea un elemento <li>.
+ * @param {string} content - El contenido del li.
+ * @param {Object} [attrs] - Atributos adicionales para el li (opcional).
+ * @returns {HTMLElement} El nodo <li>.
+ */
+export function li(content = '', attrs = {}) {
+    const el = document.createElement('li');
+    el.textContent = content;
+    Object.assign(el, attrs);  // Asigna los atributos si se pasan
+    return el;
+}
