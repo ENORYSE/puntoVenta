@@ -64,13 +64,13 @@ class MovimientoStock(models.Model):
         SALIDA = 'salida', 'Salida'
         AJUSTE = 'ajuste', 'Ajuste'
 
-    producto = models.ForeignKey( Producto, on_delete=models.CASCADE, related_name='movimientos_stock')
+    producto = models.ForeignKey( Producto, on_delete=models.SET_NULL, related_name='movimientos_stock')
     cantidad = models.IntegerField()
     tipo = models.CharField( max_length=20, choices=Tipo.choices)
     fecha = models.DateTimeField(auto_now_add=True)
     observaciones = models.TextField(blank=True)
     origen = models.CharField(max_length=100, blank=True)
-    documento_ref = models.CharField(max_length=100, blank=True)
+    documento_ref = models.CharField(max_length=100, blank=True) #ejemplo remito
 
     class Meta:
         verbose_name = "Movimiento de Stock"
@@ -87,7 +87,7 @@ class Compra(models.Model):
     total = models.DecimalField(max_digits=12, decimal_places=2)
     numero_factura = models.CharField(max_length=100, unique=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True) 
 
     class Meta:
         verbose_name = "Compra"
@@ -187,7 +187,7 @@ class CronogramaSemanal(models.Model):
             models.UniqueConstraint(fields=['turno', 'dia', 'empleado_id'])
         ]
 
-class RegistrosDeHorarioDeEmpleado(models.Model):
+class RegistroDeHorarioDeEmpleado(models.Model):
     empleado_id = models.ForeignKey(User, on_delete=models.RESTRICT)
     hora_entrada = models.DateTimeField(auto_now_add=True)
     hora_salida = models.DateTimeField(null=True)
@@ -240,7 +240,7 @@ class CajaMovimiento(models.Model):
         choices=MedioPago.choices,
         default=MedioPago.EFECTIVO
     )
-    descripcion = models.TextField()
+    descripcion = models.TextField(blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
     usuario = models.ForeignKey(User,
         on_delete=models.CASCADE,
@@ -275,7 +275,6 @@ class CajaCierre(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     fecha = models.DateTimeField()
     
-    # Calculated totals
     saldo_inicial = models.DecimalField(max_digits=12, decimal_places=2)
     total_ventas = models.DecimalField(max_digits=12, decimal_places=2)
     total_gastos = models.DecimalField(max_digits=12, decimal_places=2)
