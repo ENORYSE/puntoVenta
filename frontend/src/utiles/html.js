@@ -1,4 +1,20 @@
 /**
+ * Convierte una cadena de HTML en una lista de nodos del DOM.
+ * 
+ * @param {string} htmlString - La cadena de HTML a convertir.
+ * @returns {Node[]} Un arreglo de nodos del DOM creados a partir del HTML.
+ */
+export function toHtml(htmlString) {
+    if (typeof htmlString !== 'string') {
+        throw new Error('El parámetro debe ser una cadena (string) de HTML');
+    }
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    return doc.body.firstChild;
+}
+
+/**
  * Agrega contenido a un contenedor, ya sea un nodo del DOM o una cadena de HTML.
  * Si es una cadena de HTML, lo convierte en nodos y los agrega.
  * Si es un nodo, lo agrega directamente.
