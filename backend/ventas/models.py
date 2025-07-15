@@ -15,12 +15,16 @@ class Remito(models.Model):
 #aca pongo todo lo nuevo
 
 class Proveedor(models.Model):
+    class Tipo(models.TextChoices):
+        Fisica = "fisica","Fisica"
+        Juridica= "juridica","Juridica"
+
     nombre = models.CharField(max_length=200)
+    tipo = models.CharField(max_length=100, choices=Tipo.choices)
     cuit = models.CharField(max_length=20, unique=True)
-    direccion = models.CharField(max_length=300, blank=True)
-    telefono = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(blank=True)
-    activo = models.BooleanField(default=True)
+    direccion = models.CharField(max_length=300, blank=True, null=True)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -33,8 +37,15 @@ class Proveedor(models.Model):
         return self.nombre
 
 
+class CategoriaProducto(models.Model):
+    nombre = models.CharField(max_length=100)
+
 class Producto(models.Model):
-    codigo_barra = models.CharField(max_length=100, unique=True)
+    class Tipo(models.TextChoices):
+        consumible = "consumible","Consumible"
+
+    codigo_barra = models.CharField(max_length=100, unique=True, null=True)
+    tipo = models.CharField(max_length=100, choices = Tipo.choices)
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True)
     precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
@@ -97,6 +108,8 @@ class Compra(models.Model):
     def __str__(self):
         return f"Compra {self.numero_factura} - {self.proveedor.nombre}"
 
+
+class Servicio
 
 class DetalleCompra(models.Model):
     compra = models.ForeignKey(Compra, on_delete=models.CASCADE, related_name='detalles')
@@ -195,7 +208,6 @@ class RegistroDeHorarioDeEmpleado(models.Model):
 class Caja(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
-    activa = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -227,34 +239,17 @@ class CajaMovimiento(models.Model):
 
     class MedioPago(models.TextChoices):
         EFECTIVO = 'efectivo', 'Efectivo'
-        TARJETA_DEBITO = 'tarjeta_debito', 'Tarjeta de Débito'
-        TARJETA_CREDITO = 'tarjeta_credito', 'Tarjeta de Crédito'
         TRANSFERENCIA = 'transferencia', 'Transferencia'
-        MERCADO_PAGO = 'mercado_pago', 'Mercado Pago'
 
     caja = models.ForeignKey(Caja, on_delete=models.CASCADE, related_name='movimientos')
     tipo = models.CharField(max_length=20, choices=TipoMovimiento.choices)
     monto = models.DecimalField(max_digits=12, decimal_places=2)
-    medio_pago = models.CharField(
-        max_length=20,
-        choices=MedioPago.choices,
-        default=MedioPago.EFECTIVO
-    )
+    medio_pago = models.CharField(max_length=20, choices=MedioPago.choices, default=MedioPago.EFECTIVO)
     descripcion = models.TextField(blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
-    usuario = models.ForeignKey(User,
-        on_delete=models.CASCADE,
-        related_name='movimientos_caja'
-    )
-    venta = models.ForeignKey(
-        'Venta',
-        on_delete=models.CASCADE,
-        related_name='movimientos_caja',
-        null=True,
-        blank=True
-    )
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='movimientos_caja')
+    venta = models.ForeignKey('Venta', on_delete=models.CASCADE, related_name='movimientos_caja', null=True, blank=True)
     
-    # For tracking external references
     documento_referencia = models.CharField(max_length=100, blank=True)
     
     class Meta:
